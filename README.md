@@ -1,4 +1,4 @@
-# Firewatch Community Patch
+# Firewatch Enhanced
 
 A small collection of fixes for the Windows version of Firewatch.
 
