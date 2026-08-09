@@ -11,11 +11,13 @@ namespace FirewatchHighFpsFix
         public const string PluginVersion = "1.1.0";
 
         internal static NoclipController Noclip { get; private set; }
+        internal static FpsCounter FpsCounter { get; private set; }
 
         private void Awake()
         {
             new Harmony(PluginGuid).PatchAll();
             Noclip = new NoclipController();
+            FpsCounter = new FpsCounter();
         }
 
         private void OnDestroy()
@@ -23,6 +25,11 @@ namespace FirewatchHighFpsFix
             if (Noclip != null)
             {
                 Noclip.Disable();
+            }
+
+            if (FpsCounter != null)
+            {
+                FpsCounter.Dispose();
             }
         }
 

@@ -113,7 +113,7 @@ namespace FirewatchHighFpsFix
     }
 
     [HarmonyPatch(typeof(vgPlayerController), "Update")]
-    internal static class NoclipUpdatePatch
+    internal static class PlayerUpdatePatch
     {
         [HarmonyPostfix]
         private static void Postfix()
@@ -121,6 +121,11 @@ namespace FirewatchHighFpsFix
             if (Plugin.Noclip != null)
             {
                 Plugin.Noclip.Update();
+            }
+
+            if (Plugin.FpsCounter != null)
+            {
+                Plugin.FpsCounter.Update();
             }
         }
     }
