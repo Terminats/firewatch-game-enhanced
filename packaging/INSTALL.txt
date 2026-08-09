@@ -1,0 +1,31 @@
+Firewatch High FPS Fix 1.0.0
+================================
+
+Compatibility
+-------------
+This package targets the 64-bit GOG release of Firewatch.
+
+Installation
+------------
+1. Open the game directory containing Firewatch.exe.
+2. Extract all files from this archive directly into that directory.
+3. Start the game.
+
+The package includes BepInEx 5.4.23.5 x64. On the first launch, BepInEx creates
+its configuration and log directories automatically.
+
+Uninstall only the patch
+------------------------
+Delete:
+
+    BepInEx\plugins\FirewatchHighFpsFix.dll
+
+Removing BepInEx completely
+---------------------------
+Only do this if no other installed mods use BepInEx. Remove:
+
+    BepInEx
+    winhttp.dll
+    doorstop_config.ini
+    .doorstop_version
+

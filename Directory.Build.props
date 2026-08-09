@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <FirewatchGamePath Condition="'$(FirewatchGamePath)' == ''">C:\Program Files\GOG Galaxy\Games\Firewatch</FirewatchGamePath>
+    <FirewatchManagedPath>$(FirewatchGamePath)\Firewatch_Data\Managed</FirewatchManagedPath>
+    <BepInExCorePath>$(FirewatchGamePath)\BepInEx\core</BepInExCorePath>
+  </PropertyGroup>
+
+  <Import Project="Directory.Build.local.props" Condition="Exists('Directory.Build.local.props')" />
+</Project>
+

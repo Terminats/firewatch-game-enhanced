@@ -1,0 +1,16 @@
+[Bb]in/
+[Oo]bj/
+
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+BepInEx.zip
+lib/
+
+*.log
+Directory.Build.local.props
+
+dist/
