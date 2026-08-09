@@ -22,6 +22,11 @@ foreach ($file in @($bepInExZip, $plugin, $readme)) {
 try {
     Expand-Archive -LiteralPath $bepInExZip -DestinationPath $staging
 
+    $bepInExChangelog = Join-Path $staging "changelog.txt"
+    if (Test-Path -LiteralPath $bepInExChangelog) {
+        Remove-Item -LiteralPath $bepInExChangelog -Force
+    }
+
     New-Item -ItemType Directory -Path "$staging\BepInEx\plugins" -Force | Out-Null
     Copy-Item -LiteralPath $plugin -Destination "$staging\BepInEx\plugins\FirewatchHighFpsFix.dll"
     Copy-Item -LiteralPath $readme -Destination "$staging\FIREWATCH_HIGH_FPS_FIX_README.txt"
