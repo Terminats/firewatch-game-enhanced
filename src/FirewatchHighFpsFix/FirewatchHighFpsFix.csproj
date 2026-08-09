@@ -59,6 +59,7 @@
 
   <ItemGroup>
     <Compile Include="MovementPatch.cs" />
+    <Compile Include="NoclipController.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

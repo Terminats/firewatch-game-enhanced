@@ -1,4 +1,4 @@
-Firewatch High FPS Fix 1.0.0
+Firewatch High FPS Fix 1.1.0
 ================================
 
 Compatibility
@@ -14,6 +14,15 @@ Installation
 The package includes BepInEx 5.4.23.5 x64. On the first launch, BepInEx creates
 its configuration and log directories automatically.
 
+Noclip for testing
+------------------
+Press F8 while playing to toggle noclip.
+
+    W/A/S/D       move horizontally
+    Space         move up
+    Left Ctrl     move down
+    Left Shift    move faster
+
 Uninstall only the patch
 ------------------------
 Delete:
@@ -28,4 +37,3 @@ Only do this if no other installed mods use BepInEx. Remove:
     winhttp.dll
     doorstop_config.ini
     .doorstop_version
-
