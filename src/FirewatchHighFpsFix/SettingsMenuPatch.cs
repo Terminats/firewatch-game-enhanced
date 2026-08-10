@@ -12,17 +12,30 @@ namespace FirewatchHighFpsFix
     {
         private static GameObject fpsCheckbox;
         private static GameObject dialogueCheckbox;
+        private static GameObject fovSlider;
+        private static TextMeshProUGUI fovValueLabel;
 
         [HarmonyPostfix]
         private static void Postfix(vgSettingsMenuController __instance, int index)
         {
-            if (index != 0 || Plugin.FpsCounter == null ||
-                (fpsCheckbox != null && dialogueCheckbox != null))
+            if (Plugin.FpsCounter == null)
             {
                 return;
             }
 
-            GameObject template = FindTemplate(__instance);
+            if (index == 0 && (fpsCheckbox == null || dialogueCheckbox == null))
+            {
+                CreateGeneralOptions(__instance);
+            }
+            else if (index == 1 && fovSlider == null)
+            {
+                CreateFovSlider(__instance);
+            }
+        }
+
+        private static void CreateGeneralOptions(vgSettingsMenuController settingsMenu)
+        {
+            GameObject template = FindTemplate(settingsMenu, 0, "Minimal Interface Checkbox");
             if (template == null)
             {
                 return;
@@ -48,7 +61,131 @@ namespace FirewatchHighFpsFix
                     DialogueTimerPatch.SetEnabled);
             }
 
-            RebuildSelection(__instance);
+            RebuildSelection(settingsMenu);
+        }
+
+        private static void CreateFovSlider(vgSettingsMenuController settingsMenu)
+        {
+            GameObject template = FindSliderTemplate(settingsMenu, 1);
+            if (template == null)
+            {
+                return;
+            }
+
+            fovSlider = Object.Instantiate(template);
+            fovSlider.SetActive(false);
+            fovSlider.name = "Field of View";
+            fovSlider.transform.SetParent(template.transform.parent, false);
+            fovSlider.transform.SetSiblingIndex(template.transform.GetSiblingIndex() + 1);
+
+            RemoveOriginalOptionLogic(fovSlider);
+            ConfigureFovLabels();
+
+            Slider slider = fovSlider.GetComponentInChildren<Slider>(true);
+            if (slider != null)
+            {
+                slider.onValueChanged.RemoveAllListeners();
+                slider.minValue = FovSetting.Minimum;
+                slider.maxValue = FovSetting.Maximum;
+                slider.wholeNumbers = true;
+                slider.value = FovSetting.Value;
+                slider.onValueChanged.AddListener(SetFovValue);
+            }
+
+            fovSlider.SetActive(true);
+            RebuildSelection(settingsMenu);
+        }
+
+        private static GameObject FindSliderTemplate(
+            vgSettingsMenuController settingsMenu,
+            int screenIndex)
+        {
+            IList screens = GetScreens(settingsMenu);
+            if (screens == null || screens.Count <= screenIndex)
+            {
+                return null;
+            }
+
+            object screen = screens[screenIndex];
+            Component rootAnimator = (Component)AccessTools.Field(
+                screen.GetType(), "rootAnimator").GetValue(screen);
+            Component inputModule = (Component)AccessTools.Field(
+                screen.GetType(), "uiInputModule").GetValue(screen);
+
+            GameObject template = FindSliderRow(rootAnimator);
+            if (template == null)
+            {
+                template = FindSliderRow(inputModule);
+            }
+
+            return template;
+        }
+
+        private static GameObject FindSliderRow(Component root)
+        {
+            if (root == null)
+            {
+                return null;
+            }
+
+            Slider[] sliders = root.GetComponentsInChildren<Slider>(true);
+            for (int i = 0; i < sliders.Length; i++)
+            {
+                Transform row = sliders[i].transform;
+                GameObject sliderAncestor = row.gameObject;
+                while (row.parent != null && row.parent != root.transform)
+                {
+                    if (row.name.ToLowerInvariant().Contains("brightness"))
+                    {
+                        return row.gameObject;
+                    }
+
+                    if (row.name.ToLowerInvariant().Contains("slider"))
+                    {
+                        sliderAncestor = row.gameObject;
+                    }
+
+                    if (row.parent.GetComponent<VerticalLayoutGroup>() != null)
+                    {
+                        return row.gameObject;
+                    }
+
+                    row = row.parent;
+                }
+
+                if (sliderAncestor != null)
+                {
+                    return sliderAncestor;
+                }
+            }
+
+            return null;
+        }
+
+        private static void ConfigureFovLabels()
+        {
+            TextMeshProUGUI[] labels = fovSlider.GetComponentsInChildren<TextMeshProUGUI>(true);
+            for (int i = 0; i < labels.Length; i++)
+            {
+                if (labels[i].gameObject.name.ToLowerInvariant().Contains("value"))
+                {
+                    fovValueLabel = labels[i];
+                    fovValueLabel.text = Mathf.RoundToInt(FovSetting.Value).ToString();
+                }
+                else
+                {
+                    labels[i].text = "Field of View";
+                }
+            }
+        }
+
+        private static void SetFovValue(float value)
+        {
+            FovSetting.SetValue(value);
+            if (fovValueLabel != null)
+            {
+                fovValueLabel.text = Mathf.RoundToInt(value).ToString();
+            }
         }
 
         private static GameObject CreateCheckbox(
@@ -72,16 +209,18 @@ namespace FirewatchHighFpsFix
             return checkbox;
         }
 
-        private static GameObject FindTemplate(vgSettingsMenuController settingsMenu)
+        private static GameObject FindTemplate(
+            vgSettingsMenuController settingsMenu,
+            int screenIndex,
+            string objectName)
         {
-            IList screens = (IList)AccessTools.Field(
-                typeof(vgSettingsMenuController), "screens").GetValue(settingsMenu);
-            if (screens == null || screens.Count == 0)
+            IList screens = GetScreens(settingsMenu);
+            if (screens == null || screens.Count <= screenIndex)
             {
                 return null;
             }
 
-            object generalScreen = screens[0];
+            object generalScreen = screens[screenIndex];
             Component rootAnimator = (Component)AccessTools.Field(
                 generalScreen.GetType(), "rootAnimator").GetValue(generalScreen);
             if (rootAnimator == null)
@@ -92,13 +231,19 @@ namespace FirewatchHighFpsFix
             Transform[] children = rootAnimator.GetComponentsInChildren<Transform>(true);
             for (int i = 0; i < children.Length; i++)
             {
-                if (children[i].name == "Minimal Interface Checkbox")
+                if (children[i].name == objectName)
                 {
                     return children[i].gameObject;
                 }
             }
 
             return null;
+        }
+
+        private static IList GetScreens(vgSettingsMenuController settingsMenu)
+        {
+            return (IList)AccessTools.Field(
+                typeof(vgSettingsMenuController), "screens").GetValue(settingsMenu);
         }
 
         private static void RemoveOriginalOptionLogic(GameObject checkbox)
