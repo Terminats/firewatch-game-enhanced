@@ -77,6 +77,7 @@
     <Compile Include="NoclipController.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="SettingsMenuPatch.cs" />
+    <Compile Include="SkipIntroPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
