@@ -14,6 +14,14 @@ Installation
 The package includes BepInEx 5.4.23.5 x64. On the first launch, BepInEx creates
 its configuration and log directories automatically.
 
+Features
+--------
+- High frame rate movement fix
+- Optional FPS counter in General (off by default)
+- Optional unlimited dialogue time in General (off by default)
+- Field of View slider in Graphics (30-110, default 55)
+- Mouse Acceleration checkbox in Controls
+
 Noclip for testing
 ------------------
 Press F8 while playing to toggle noclip.

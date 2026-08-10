@@ -2,8 +2,19 @@
 
 A small collection of fixes for the Windows version of Firewatch.
 
-Right now it fixes a movement bug at high frame rates. With VSync disabled, the
-player could slow down, stop moving, or become unable to move in one direction. This plugin fixes it.
+
+## Features
+- Fixes player movement at high frame rates with VSync disabled.
+- Adds an optional FPS counter. It is disabled by default.
+- Adds an option to remove the time limit from dialogue choices. It is disabled
+  by default.
+- Adds a Field of View slider with a range of 30 to 110. The original value is
+  55.
+- Exposes the game's hidden Mouse Acceleration setting in the Controls menu. You need to disable that option if you're experiencing an issue with high mouse sensitivity.
+- Includes a simple noclip mode for getting out of world geometry.
+
+The new options are available in the existing General, Graphics, and Controls
+menus. Their values are saved by the game.
 
 ## Installation
 
