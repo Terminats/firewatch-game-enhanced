@@ -12,6 +12,7 @@ A small collection of fixes for the Windows version of Firewatch.
   55.
 - Exposes the game's hidden Mouse Acceleration setting in the Controls menu. You need to disable that option if you're experiencing an issue with high mouse sensitivity.
 - Includes a simple noclip mode for unstucking your character.
+- Includes Ignore Pads option which is set by default, this fixes issue with controllers causing automatic rotation of character.
 
 The new options are available in the existing General, Graphics, and Controls settings.
 

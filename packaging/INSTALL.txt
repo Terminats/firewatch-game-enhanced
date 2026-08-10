@@ -1,4 +1,4 @@
-Firewatch Enhanced 1.1.0
+Firewatch Enhanced 1.1.1
 ========================
 
 Compatibility
@@ -21,6 +21,7 @@ Features
 - Optional unlimited dialogue time in General (off by default)
 - Field of View slider in Graphics (30-110, default 55)
 - Mouse Acceleration checkbox in Controls
+- Includes Ignore Pads option which is set by default, this fixes issue with controllers causing automatic rotation of character.
 
 Noclip for testing
 ------------------
