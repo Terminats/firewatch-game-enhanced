@@ -7,7 +7,7 @@ namespace FirewatchHighFpsFix
     public sealed class Plugin : BaseUnityPlugin
     {
         public const string PluginGuid = "pl.firewatch.highfpsfix";
-        public const string PluginName = "Firewatch High FPS Fix";
+        public const string PluginName = "Firewatch Enhanced";
         public const string PluginVersion = "1.1.0";
 
         internal static NoclipController Noclip { get; private set; }

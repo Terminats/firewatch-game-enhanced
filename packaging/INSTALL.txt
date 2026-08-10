@@ -1,5 +1,5 @@
-Firewatch High FPS Fix 1.1.0
-================================
+Firewatch Enhanced 1.1.0
+========================
 
 Compatibility
 -------------

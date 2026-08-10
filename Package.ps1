@@ -10,8 +10,8 @@ $bepInExZip = Join-Path $root "BepInEx.zip"
 $plugin = Join-Path $root "src\FirewatchHighFpsFix\bin\Release\FirewatchHighFpsFix.dll"
 $readme = Join-Path $root "packaging\INSTALL.txt"
 $dist = Join-Path $root "dist"
-$outputZip = Join-Path $dist "FirewatchHighFpsFix-$Version-GOG-win-x64.zip"
-$staging = Join-Path ([IO.Path]::GetTempPath()) ("FirewatchHighFpsFix-" + [Guid]::NewGuid().ToString("N"))
+$outputZip = Join-Path $dist "FirewatchEnhanced-$Version-GOG-win-x64.zip"
+$staging = Join-Path ([IO.Path]::GetTempPath()) ("FirewatchEnhanced-" + [Guid]::NewGuid().ToString("N"))
 
 foreach ($file in @($bepInExZip, $plugin, $readme)) {
     if (-not (Test-Path -LiteralPath $file)) {
@@ -29,7 +29,7 @@ try {
 
     New-Item -ItemType Directory -Path "$staging\BepInEx\plugins" -Force | Out-Null
     Copy-Item -LiteralPath $plugin -Destination "$staging\BepInEx\plugins\FirewatchHighFpsFix.dll"
-    Copy-Item -LiteralPath $readme -Destination "$staging\FIREWATCH_HIGH_FPS_FIX_README.txt"
+    Copy-Item -LiteralPath $readme -Destination "$staging\FIREWATCH_ENHANCED_README.txt"
 
     New-Item -ItemType Directory -Path $dist -Force | Out-Null
     if (Test-Path -LiteralPath $outputZip) {
