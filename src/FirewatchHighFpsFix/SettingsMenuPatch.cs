@@ -14,6 +14,7 @@ namespace FirewatchHighFpsFix
         private static GameObject dialogueCheckbox;
         private static GameObject fovSlider;
         private static GameObject mouseAccelerationCheckbox;
+        private static GameObject ignoreOtherInputDevicesCheckbox;
         private static TextMeshProUGUI fovValueLabel;
 
         [HarmonyPostfix]
@@ -32,7 +33,8 @@ namespace FirewatchHighFpsFix
             {
                 CreateFovSlider(__instance);
             }
-            else if (index == 2 && mouseAccelerationCheckbox == null)
+            else if (index == 2 &&
+                (mouseAccelerationCheckbox == null || ignoreOtherInputDevicesCheckbox == null))
             {
                 CreateControlsOptions(__instance);
             }
@@ -109,12 +111,26 @@ namespace FirewatchHighFpsFix
                 return;
             }
 
-            mouseAccelerationCheckbox = CreateCheckbox(
-                template,
-                "Mouse Acceleration",
-                1,
-                vgSettingsManager.Instance.mouseAcceleration,
-                SetMouseAcceleration);
+            if (mouseAccelerationCheckbox == null)
+            {
+                mouseAccelerationCheckbox = CreateCheckbox(
+                    template,
+                    "Mouse Acceleration",
+                    1,
+                    vgSettingsManager.Instance.mouseAcceleration,
+                    SetMouseAcceleration);
+            }
+
+            if (ignoreOtherInputDevicesCheckbox == null)
+            {
+                vgSettingsManager.Instance.disableControllers = Plugin.IgnoreGamepads.Value;
+                ignoreOtherInputDevicesCheckbox = CreateCheckbox(
+                    template,
+                    "Ignore Pads",
+                    2,
+                    Plugin.IgnoreGamepads.Value,
+                    SetIgnoreOtherInputDevices);
+            }
 
             RebuildSelection(settingsMenu);
         }
@@ -124,6 +140,15 @@ namespace FirewatchHighFpsFix
             if (vgSettingsManager.Instance != null)
             {
                 vgSettingsManager.Instance.mouseAcceleration = value;
+            }
+        }
+
+        private static void SetIgnoreOtherInputDevices(bool value)
+        {
+            Plugin.IgnoreGamepads.Value = value;
+            if (vgSettingsManager.Instance != null)
+            {
+                vgSettingsManager.Instance.disableControllers = value;
             }
         }
 
@@ -294,7 +319,14 @@ namespace FirewatchHighFpsFix
             checkbox.SetActive(false);
             checkbox.name = label;
             checkbox.transform.SetParent(template.transform.parent, false);
-            checkbox.transform.SetSiblingIndex(template.transform.GetSiblingIndex() + siblingOffset);
+            if (siblingOffset < 0)
+            {
+                checkbox.transform.SetAsLastSibling();
+            }
+            else
+            {
+                checkbox.transform.SetSiblingIndex(template.transform.GetSiblingIndex() + siblingOffset);
+            }
 
             RemoveOriginalOptionLogic(checkbox);
             SetLabel(checkbox, label);
