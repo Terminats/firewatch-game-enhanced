@@ -13,6 +13,7 @@ namespace FirewatchHighFpsFix
         private static GameObject fpsCheckbox;
         private static GameObject dialogueCheckbox;
         private static GameObject fovSlider;
+        private static GameObject mouseAccelerationCheckbox;
         private static TextMeshProUGUI fovValueLabel;
 
         [HarmonyPostfix]
@@ -30,6 +31,10 @@ namespace FirewatchHighFpsFix
             else if (index == 1 && fovSlider == null)
             {
                 CreateFovSlider(__instance);
+            }
+            else if (index == 2 && mouseAccelerationCheckbox == null)
+            {
+                CreateControlsOptions(__instance);
             }
         }
 
@@ -94,6 +99,96 @@ namespace FirewatchHighFpsFix
 
             fovSlider.SetActive(true);
             RebuildSelection(settingsMenu);
+        }
+
+        private static void CreateControlsOptions(vgSettingsMenuController settingsMenu)
+        {
+            GameObject template = FindToggleTemplate(settingsMenu, 2);
+            if (template == null || vgSettingsManager.Instance == null)
+            {
+                return;
+            }
+
+            mouseAccelerationCheckbox = CreateCheckbox(
+                template,
+                "Mouse Acceleration",
+                1,
+                vgSettingsManager.Instance.mouseAcceleration,
+                SetMouseAcceleration);
+
+            RebuildSelection(settingsMenu);
+        }
+
+        private static void SetMouseAcceleration(bool value)
+        {
+            if (vgSettingsManager.Instance != null)
+            {
+                vgSettingsManager.Instance.mouseAcceleration = value;
+            }
+        }
+
+        private static GameObject FindToggleTemplate(
+            vgSettingsMenuController settingsMenu,
+            int screenIndex)
+        {
+            IList screens = GetScreens(settingsMenu);
+            if (screens == null || screens.Count <= screenIndex)
+            {
+                return null;
+            }
+
+            object screen = screens[screenIndex];
+            Component rootAnimator = (Component)AccessTools.Field(
+                screen.GetType(), "rootAnimator").GetValue(screen);
+            Component inputModule = (Component)AccessTools.Field(
+                screen.GetType(), "uiInputModule").GetValue(screen);
+
+            GameObject template = FindToggleRow(rootAnimator);
+            if (template == null)
+            {
+                template = FindToggleRow(inputModule);
+            }
+
+            return template;
+        }
+
+        private static GameObject FindToggleRow(Component root)
+        {
+            if (root == null)
+            {
+                return null;
+            }
+
+            Toggle[] toggles = root.GetComponentsInChildren<Toggle>(true);
+            if (toggles.Length == 0)
+            {
+                return null;
+            }
+
+            Transform row = toggles[0].transform;
+            GameObject toggleAncestor = row.gameObject;
+            while (row.parent != null && row.parent != root.transform)
+            {
+                string rowName = row.name.ToLowerInvariant();
+                if (rowName.Contains("inverty") || rowName.Contains("left handed"))
+                {
+                    return row.gameObject;
+                }
+
+                if (rowName.Contains("toggle"))
+                {
+                    toggleAncestor = row.gameObject;
+                }
+
+                if (row.parent.GetComponent<VerticalLayoutGroup>() != null)
+                {
+                    return row.gameObject;
+                }
+
+                row = row.parent;
+            }
+
+            return toggleAncestor;
         }
 
         private static GameObject FindSliderTemplate(
