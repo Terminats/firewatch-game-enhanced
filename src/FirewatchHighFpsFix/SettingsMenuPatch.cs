@@ -2,6 +2,7 @@ using System.Collections;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace FirewatchHighFpsFix
@@ -9,45 +10,66 @@ namespace FirewatchHighFpsFix
     [HarmonyPatch(typeof(vgSettingsMenuController), "ShowMenu")]
     internal static class SettingsMenuPatch
     {
-        private const string CheckboxName = "FPS Counter";
-        private static GameObject checkboxObject;
+        private static GameObject fpsCheckbox;
+        private static GameObject dialogueCheckbox;
 
         [HarmonyPostfix]
         private static void Postfix(vgSettingsMenuController __instance, int index)
         {
-            if (index == 0 && Plugin.FpsCounter != null && checkboxObject == null)
+            if (index != 0 || Plugin.FpsCounter == null ||
+                (fpsCheckbox != null && dialogueCheckbox != null))
             {
-                CreateCheckbox(__instance);
+                return;
             }
-        }
 
-        private static void CreateCheckbox(vgSettingsMenuController settingsMenu)
-        {
-            GameObject template = FindTemplate(settingsMenu);
+            GameObject template = FindTemplate(__instance);
             if (template == null)
             {
                 return;
             }
 
-            checkboxObject = Object.Instantiate(template);
-            checkboxObject.SetActive(false);
-            checkboxObject.name = CheckboxName;
-            checkboxObject.transform.SetParent(template.transform.parent, false);
-            checkboxObject.transform.SetSiblingIndex(template.transform.GetSiblingIndex() + 1);
-
-            RemoveOriginalOptionLogic();
-            SetLabel();
-            ConnectToggle();
-
-            checkboxObject.SetActive(true);
-
-            vgActiveSelectionGroup selectionGroup = (vgActiveSelectionGroup)
-                AccessTools.Field(typeof(vgSettingsMenuController), "selectionGroup").GetValue(settingsMenu);
-            if (selectionGroup != null)
+            if (fpsCheckbox == null)
             {
-                AccessTools.Method(typeof(vgActiveSelectionGroup), "RebuildSelectableList").Invoke(
-                    selectionGroup, null);
+                fpsCheckbox = CreateCheckbox(
+                    template,
+                    "FPS Counter",
+                    1,
+                    Plugin.FpsCounter.Enabled,
+                    Plugin.FpsCounter.SetEnabled);
             }
+
+            if (dialogueCheckbox == null)
+            {
+                dialogueCheckbox = CreateCheckbox(
+                    template,
+                    "Unlimited Dialogue Time",
+                    2,
+                    DialogueTimerPatch.Enabled,
+                    DialogueTimerPatch.SetEnabled);
+            }
+
+            RebuildSelection(__instance);
+        }
+
+        private static GameObject CreateCheckbox(
+            GameObject template,
+            string label,
+            int siblingOffset,
+            bool initialValue,
+            UnityAction<bool> onValueChanged)
+        {
+            GameObject checkbox = Object.Instantiate(template);
+            checkbox.SetActive(false);
+            checkbox.name = label;
+            checkbox.transform.SetParent(template.transform.parent, false);
+            checkbox.transform.SetSiblingIndex(template.transform.GetSiblingIndex() + siblingOffset);
+
+            RemoveOriginalOptionLogic(checkbox);
+            SetLabel(checkbox, label);
+            ConnectToggle(checkbox, initialValue, onValueChanged);
+
+            checkbox.SetActive(true);
+            return checkbox;
         }
 
         private static GameObject FindTemplate(vgSettingsMenuController settingsMenu)
@@ -79,9 +101,9 @@ namespace FirewatchHighFpsFix
             return null;
         }
 
-        private static void RemoveOriginalOptionLogic()
+        private static void RemoveOriginalOptionLogic(GameObject checkbox)
         {
-            MonoBehaviour[] behaviours = checkboxObject.GetComponentsInChildren<MonoBehaviour>(true);
+            MonoBehaviour[] behaviours = checkbox.GetComponentsInChildren<MonoBehaviour>(true);
             for (int i = 0; i < behaviours.Length; i++)
             {
                 string typeName = behaviours[i].GetType().Name;
@@ -92,32 +114,46 @@ namespace FirewatchHighFpsFix
             }
         }
 
-        private static void SetLabel()
+        private static void SetLabel(GameObject checkbox, string label)
         {
-            TextMeshProUGUI[] labels = checkboxObject.GetComponentsInChildren<TextMeshProUGUI>(true);
+            TextMeshProUGUI[] labels = checkbox.GetComponentsInChildren<TextMeshProUGUI>(true);
             for (int i = 0; i < labels.Length; i++)
             {
-                labels[i].text = "FPS Counter";
+                labels[i].text = label;
             }
         }
 
-        private static void ConnectToggle()
+        private static void ConnectToggle(
+            GameObject checkbox,
+            bool initialValue,
+            UnityAction<bool> onValueChanged)
         {
-            Toggle toggle = checkboxObject.GetComponentInChildren<Toggle>(true);
+            Toggle toggle = checkbox.GetComponentInChildren<Toggle>(true);
             if (toggle == null)
             {
                 return;
             }
 
             toggle.onValueChanged.RemoveAllListeners();
-            toggle.isOn = Plugin.FpsCounter.Enabled;
-            toggle.onValueChanged.AddListener(Plugin.FpsCounter.SetEnabled);
+            toggle.isOn = initialValue;
+            toggle.onValueChanged.AddListener(onValueChanged);
 
-            Button[] buttons = checkboxObject.GetComponentsInChildren<Button>(true);
+            Button[] buttons = checkbox.GetComponentsInChildren<Button>(true);
             for (int i = 0; i < buttons.Length; i++)
             {
                 buttons[i].onClick.RemoveAllListeners();
                 buttons[i].onClick.AddListener(delegate { toggle.isOn = !toggle.isOn; });
+            }
+        }
+
+        private static void RebuildSelection(vgSettingsMenuController settingsMenu)
+        {
+            vgActiveSelectionGroup selectionGroup = (vgActiveSelectionGroup)
+                AccessTools.Field(typeof(vgSettingsMenuController), "selectionGroup").GetValue(settingsMenu);
+            if (selectionGroup != null)
+            {
+                AccessTools.Method(typeof(vgActiveSelectionGroup), "RebuildSelectableList").Invoke(
+                    selectionGroup, null);
             }
         }
     }

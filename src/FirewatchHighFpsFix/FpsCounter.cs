@@ -15,7 +15,7 @@ namespace FirewatchHighFpsFix
 
         internal bool Enabled
         {
-            get { return PlayerPrefs.GetInt(EnabledPreference, 1) != 0; }
+            get { return PlayerPrefs.GetInt(EnabledPreference, 0) != 0; }
         }
 
         internal void Update()
