@@ -11,10 +11,9 @@ A small collection of fixes for the Windows version of Firewatch.
 - Adds a Field of View slider with a range of 30 to 110. The original value is
   55.
 - Exposes the game's hidden Mouse Acceleration setting in the Controls menu. You need to disable that option if you're experiencing an issue with high mouse sensitivity.
-- Includes a simple noclip mode for getting out of world geometry.
+- Includes a simple noclip mode for unstucking your character.
 
-The new options are available in the existing General, Graphics, and Controls
-menus. Their values are saved by the game.
+The new options are available in the existing General, Graphics, and Controls settings.
 
 ## Installation
 
