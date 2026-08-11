@@ -1,4 +1,4 @@
-Firewatch Enhanced 1.1.1
+Firewatch Enhanced 1.2.0
 ========================
 
 Compatibility
@@ -19,9 +19,13 @@ Features
 - High frame rate movement fix
 - Optional FPS counter in General (off by default)
 - Optional unlimited dialogue time in General (off by default)
+- Subtitle Size slider in General (75%-200%, default 100%)
 - Field of View slider in Graphics (30-110, default 55)
 - Mouse Acceleration checkbox in Controls
 - Includes Ignore Pads option which is set by default, this fixes issue with controllers causing automatic rotation of character.
+- New Game (Skip Intro) button
+- Faster save loading and asset-streaming improvements
+- Reduced player interaction checks above 60 FPS
 
 Noclip for testing
 ------------------

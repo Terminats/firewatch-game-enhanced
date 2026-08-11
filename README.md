@@ -8,11 +8,16 @@ A small collection of fixes for the Windows version of Firewatch.
 - Adds an optional FPS counter. It is disabled by default.
 - Adds an option to remove the time limit from dialogue choices. It is disabled
   by default.
+- Adds a subtitle size slider with a range of 75% to 200%. The original size is
+  100%.
 - Adds a Field of View slider with a range of 30 to 110. The original value is
   55.
 - Exposes the game's hidden Mouse Acceleration setting in the Controls menu. You need to disable that option if you're experiencing an issue with high mouse sensitivity.
-- Includes a simple noclip mode for unstucking your character.
 - Includes Ignore Pads option which is set by default, this fixes issue with controllers causing automatic rotation of character.
+- Adds a New Game (Skip Intro) button that skips the opening text sequence.
+- Includes a simple noclip mode for unstucking your character.
+- Improves save loading and reduces some asset-streaming stalls.
+- Reduces unnecessary player interaction checks above 60 FPS.
 
 The new options are available in the existing General, Graphics, and Controls settings.
 
