@@ -8,6 +8,7 @@ namespace FirewatchHighFpsFix
     internal static class SkipIntroState
     {
         internal static GameObject Button;
+        internal static GameObject Forrest64Button;
     }
 
     [HarmonyPatch(typeof(vgMainMenuController), "Start")]
@@ -16,25 +17,41 @@ namespace FirewatchHighFpsFix
         [HarmonyPostfix]
         private static void Postfix(vgMainMenuController __instance)
         {
-            if (SkipIntroState.Button != null)
-            {
-                return;
-            }
-
             Button template = FindNewGameButton(__instance);
             if (template == null)
             {
                 return;
             }
 
+            if (SkipIntroState.Button == null)
+            {
+                SkipIntroState.Button = CreateButton(
+                    template,
+                    "New Game Skip Intro",
+                    "NEW GAME (SKIP INTRO)",
+                    1,
+                    delegate { BeginSkipIntro(__instance); });
+            }
+
+            RebuildSelection(template.gameObject);
+        }
+
+        internal static GameObject CreateButton(
+            Button template,
+            string objectName,
+            string label,
+            int siblingOffset,
+            UnityEngine.Events.UnityAction onClick)
+        {
             GameObject clone = UnityEngine.Object.Instantiate(template.gameObject);
             clone.SetActive(false);
-            clone.name = "New Game Skip Intro";
+            clone.name = objectName;
             clone.transform.SetParent(template.transform.parent, false);
-            clone.transform.SetSiblingIndex(template.transform.GetSiblingIndex() + 1);
+            clone.transform.SetSiblingIndex(
+                template.transform.GetSiblingIndex() + siblingOffset);
 
             RemoveOriginalLogic(clone);
-            SetLabel(clone, "NEW GAME (SKIP INTRO)");
+            SetLabel(clone, label);
 
             Button button = clone.GetComponent<Button>();
             if (button == null)
@@ -45,15 +62,14 @@ namespace FirewatchHighFpsFix
             if (button == null)
             {
                 UnityEngine.Object.Destroy(clone);
-                return;
+                return null;
             }
 
             button.onClick = new Button.ButtonClickedEvent();
-            button.onClick.AddListener(delegate { BeginSkipIntro(__instance); });
+            button.onClick.AddListener(onClick);
 
-            SkipIntroState.Button = clone;
             clone.SetActive(true);
-            RebuildSelection(clone);
+            return clone;
         }
 
         private static Button FindNewGameButton(vgMainMenuController controller)
@@ -103,7 +119,7 @@ namespace FirewatchHighFpsFix
             }
         }
 
-        private static void RebuildSelection(GameObject button)
+        internal static void RebuildSelection(GameObject button)
         {
             vgActiveSelectionGroup group = button.GetComponentInParent<vgActiveSelectionGroup>();
             if (group != null)
@@ -112,6 +128,52 @@ namespace FirewatchHighFpsFix
                     group,
                     null);
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(vgSpecialFeaturesMenuController), "OnEnable")]
+    internal static class Forrest64SpecialFeaturesButtonPatch
+    {
+        [HarmonyPostfix]
+        private static void Postfix(vgSpecialFeaturesMenuController __instance)
+        {
+            Button template = FindFreeRoamButton(__instance);
+            if (template == null)
+            {
+                return;
+            }
+
+            if (SkipIntroState.Forrest64Button == null)
+            {
+                SkipIntroState.Forrest64Button = SkipIntroButtonPatch.CreateButton(
+                    template,
+                    "Forrest 64 Prototype",
+                    "FORREST 64 (PROTOTYPE)",
+                    1,
+                    Forrest64Controller.Start);
+            }
+
+            SkipIntroButtonPatch.RebuildSelection(template.gameObject);
+        }
+
+        private static Button FindFreeRoamButton(
+            vgSpecialFeaturesMenuController controller)
+        {
+            Button[] buttons = controller.GetComponentsInChildren<Button>(true);
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                int listenerCount = buttons[i].onClick.GetPersistentEventCount();
+                for (int j = 0; j < listenerCount; j++)
+                {
+                    if (buttons[i].onClick.GetPersistentMethodName(j) ==
+                        "OnClickNewFreeRoamGame")
+                    {
+                        return buttons[i];
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

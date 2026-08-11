@@ -24,6 +24,7 @@ namespace FirewatchHighFpsFix
                 "Ignore input from connected controllers and virtual gamepads.");
             TextureStreamingPatch.Apply();
             new Harmony(PluginGuid).PatchAll();
+            Forrest64Controller.Initialize();
             Noclip = new NoclipController();
             FpsCounter = new FpsCounter();
         }
@@ -41,6 +42,17 @@ namespace FirewatchHighFpsFix
             }
 
             SaveLoadingPerformancePatch.RestoreUploadTimeSlice();
+            Forrest64Controller.Dispose();
+        }
+
+        private void Update()
+        {
+            Forrest64Controller.Update();
+        }
+
+        private void OnGUI()
+        {
+            Forrest64Controller.OnGUI();
         }
 
     }

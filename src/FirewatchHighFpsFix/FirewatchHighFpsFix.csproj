@@ -43,12 +43,20 @@
       <HintPath>$(FirewatchManagedPath)\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PlayMaker">
+      <HintPath>$(FirewatchManagedPath)\PlayMaker.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(FirewatchManagedPath)\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(FirewatchManagedPath)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(FirewatchManagedPath)\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
@@ -73,6 +81,7 @@
     <Compile Include="DialogueTimerPatch.cs" />
     <Compile Include="FpsCounter.cs" />
     <Compile Include="FovSetting.cs" />
+    <Compile Include="Forrest64Controller.cs" />
     <Compile Include="MovementPatch.cs" />
     <Compile Include="NoclipController.cs" />
     <Compile Include="Plugin.cs" />
