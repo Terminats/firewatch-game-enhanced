@@ -73,7 +73,6 @@
     <Compile Include="DialogueTimerPatch.cs" />
     <Compile Include="FpsCounter.cs" />
     <Compile Include="FovSetting.cs" />
-    <Compile Include="FastBootPatch.cs" />
     <Compile Include="MovementPatch.cs" />
     <Compile Include="NoclipController.cs" />
     <Compile Include="Plugin.cs" />

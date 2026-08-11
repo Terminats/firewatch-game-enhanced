@@ -17,11 +17,6 @@ namespace FirewatchHighFpsFix
 
         private void Awake()
         {
-            RemoveObsoletePerformanceSetting("SmoothWorldStreaming");
-            RemoveObsoletePerformanceSetting("ReduceLocationStutter");
-            RemoveObsoletePerformanceSetting("FastSaveLoading");
-            Config.Save();
-
             IgnoreGamepads = Config.Bind(
                 "Controls",
                 "IgnoreGamepads",
@@ -46,16 +41,6 @@ namespace FirewatchHighFpsFix
             }
 
             SaveLoadingPerformancePatch.RestoreUploadTimeSlice();
-        }
-
-        private void RemoveObsoletePerformanceSetting(string key)
-        {
-            ConfigDefinition definition = new ConfigDefinition("Performance", key);
-            Config.Bind(
-                definition,
-                true,
-                new ConfigDescription("Obsolete setting retained only for configuration migration."));
-            Config.Remove(definition);
         }
 
     }
