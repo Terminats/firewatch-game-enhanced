@@ -82,7 +82,7 @@ namespace FirewatchHighFpsFix
                 CreateSubtitleScaleSlider(settingsMenu);
             }
 
-            RebuildSelection(settingsMenu);
+            RebuildSelection(settingsMenu, 0);
         }
 
         private static void WrapGeneralOptionsInOneRow(GameObject template)
@@ -244,7 +244,7 @@ namespace FirewatchHighFpsFix
             }
 
             fovSlider.SetActive(true);
-            RebuildSelection(settingsMenu);
+            RebuildSelection(settingsMenu, 1);
         }
 
         private static void CreateControlsOptions(vgSettingsMenuController settingsMenu)
@@ -276,7 +276,7 @@ namespace FirewatchHighFpsFix
                     SetIgnoreOtherInputDevices);
             }
 
-            RebuildSelection(settingsMenu);
+            RebuildSelection(settingsMenu, 2);
         }
 
         private static void SetMouseAcceleration(bool value)
@@ -585,7 +585,9 @@ namespace FirewatchHighFpsFix
             }
         }
 
-        private static void RebuildSelection(vgSettingsMenuController settingsMenu)
+        private static void RebuildSelection(
+            vgSettingsMenuController settingsMenu,
+            int screenIndex)
         {
             vgActiveSelectionGroup selectionGroup = (vgActiveSelectionGroup)
                 AccessTools.Field(typeof(vgSettingsMenuController), "selectionGroup").GetValue(settingsMenu);
@@ -593,6 +595,7 @@ namespace FirewatchHighFpsFix
             {
                 AccessTools.Method(typeof(vgActiveSelectionGroup), "RebuildSelectableList").Invoke(
                     selectionGroup, null);
+                selectionGroup.SetCurrentSelection(screenIndex);
             }
         }
     }
