@@ -16,8 +16,7 @@ namespace FirewatchHighFpsFix
 
         internal static void Apply()
         {
-            if (Plugin.ReduceLocationStutter.Value &&
-                QualitySettings.asyncUploadBufferSize < MinimumUploadBufferSizeMb)
+            if (QualitySettings.asyncUploadBufferSize < MinimumUploadBufferSizeMb)
             {
                 QualitySettings.asyncUploadBufferSize = MinimumUploadBufferSizeMb;
             }

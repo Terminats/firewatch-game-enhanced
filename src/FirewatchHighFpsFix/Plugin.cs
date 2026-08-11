@@ -12,22 +12,21 @@ namespace FirewatchHighFpsFix
         public const string PluginVersion = "1.1.1";
 
         internal static ConfigEntry<bool> IgnoreGamepads { get; private set; }
-        internal static ConfigEntry<bool> ReduceLocationStutter { get; private set; }
         internal static NoclipController Noclip { get; private set; }
         internal static FpsCounter FpsCounter { get; private set; }
 
         private void Awake()
         {
+            RemoveObsoletePerformanceSetting("SmoothWorldStreaming");
+            RemoveObsoletePerformanceSetting("ReduceLocationStutter");
+            RemoveObsoletePerformanceSetting("FastSaveLoading");
+            Config.Save();
+
             IgnoreGamepads = Config.Bind(
                 "Controls",
                 "IgnoreGamepads",
                 true,
                 "Ignore input from connected controllers and virtual gamepads.");
-            ReduceLocationStutter = Config.Bind(
-                "Performance",
-                "ReduceLocationStutter",
-                true,
-                "Preallocate a larger Unity texture upload buffer to avoid resizing it while moving between areas.");
             TextureStreamingPatch.Apply();
             new Harmony(PluginGuid).PatchAll();
             Noclip = new NoclipController();
@@ -45,6 +44,18 @@ namespace FirewatchHighFpsFix
             {
                 FpsCounter.Dispose();
             }
+
+            SaveLoadingPerformancePatch.RestoreUploadTimeSlice();
+        }
+
+        private void RemoveObsoletePerformanceSetting(string key)
+        {
+            ConfigDefinition definition = new ConfigDefinition("Performance", key);
+            Config.Bind(
+                definition,
+                true,
+                new ConfigDescription("Obsolete setting retained only for configuration migration."));
+            Config.Remove(definition);
         }
 
     }

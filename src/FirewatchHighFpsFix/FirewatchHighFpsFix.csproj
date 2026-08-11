@@ -76,6 +76,7 @@
     <Compile Include="MovementPatch.cs" />
     <Compile Include="NoclipController.cs" />
     <Compile Include="Plugin.cs" />
+    <Compile Include="SaveLoadingPerformancePatch.cs" />
     <Compile Include="SettingsMenuPatch.cs" />
     <Compile Include="SkipIntroPatch.cs" />
     <Compile Include="TargetingPerformancePatch.cs" />
