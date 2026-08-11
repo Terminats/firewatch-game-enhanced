@@ -79,6 +79,7 @@
     <Compile Include="SaveLoadingPerformancePatch.cs" />
     <Compile Include="SettingsMenuPatch.cs" />
     <Compile Include="SkipIntroPatch.cs" />
+    <Compile Include="SubtitleScaleSetting.cs" />
     <Compile Include="TargetingPerformancePatch.cs" />
     <Compile Include="TextureStreamingPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

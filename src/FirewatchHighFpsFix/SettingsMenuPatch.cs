@@ -12,10 +12,13 @@ namespace FirewatchHighFpsFix
     {
         private static GameObject fpsCheckbox;
         private static GameObject dialogueCheckbox;
+        private static GameObject generalOptionsRow;
+        private static GameObject subtitleScaleSlider;
         private static GameObject fovSlider;
         private static GameObject mouseAccelerationCheckbox;
         private static GameObject ignoreOtherInputDevicesCheckbox;
         private static TextMeshProUGUI fovValueLabel;
+        private static TextMeshProUGUI subtitleScaleValueLabel;
 
         [HarmonyPostfix]
         private static void Postfix(vgSettingsMenuController __instance, int index)
@@ -25,7 +28,8 @@ namespace FirewatchHighFpsFix
                 return;
             }
 
-            if (index == 0 && (fpsCheckbox == null || dialogueCheckbox == null))
+            if (index == 0 &&
+                (fpsCheckbox == null || dialogueCheckbox == null || subtitleScaleSlider == null))
             {
                 CreateGeneralOptions(__instance);
             }
@@ -68,7 +72,147 @@ namespace FirewatchHighFpsFix
                     DialogueTimerPatch.SetEnabled);
             }
 
+            if (generalOptionsRow == null)
+            {
+                WrapGeneralOptionsInOneRow(template);
+            }
+
+            if (subtitleScaleSlider == null)
+            {
+                CreateSubtitleScaleSlider(settingsMenu);
+            }
+
             RebuildSelection(settingsMenu);
+        }
+
+        private static void WrapGeneralOptionsInOneRow(GameObject template)
+        {
+            if (fpsCheckbox == null || dialogueCheckbox == null ||
+                fpsCheckbox.transform.parent != dialogueCheckbox.transform.parent)
+            {
+                return;
+            }
+
+            Transform parent = fpsCheckbox.transform.parent;
+            int siblingIndex = Mathf.Min(
+                fpsCheckbox.transform.GetSiblingIndex(),
+                dialogueCheckbox.transform.GetSiblingIndex());
+
+            generalOptionsRow = new GameObject(
+                "Firewatch Enhanced Options",
+                typeof(RectTransform),
+                typeof(HorizontalLayoutGroup),
+                typeof(LayoutElement));
+            generalOptionsRow.transform.SetParent(parent, false);
+            generalOptionsRow.transform.SetSiblingIndex(siblingIndex);
+
+            RectTransform templateRect = template.GetComponent<RectTransform>();
+            RectTransform rowRect = generalOptionsRow.GetComponent<RectTransform>();
+            if (templateRect != null)
+            {
+                rowRect.anchorMin = templateRect.anchorMin;
+                rowRect.anchorMax = templateRect.anchorMax;
+                rowRect.pivot = templateRect.pivot;
+                rowRect.sizeDelta = templateRect.sizeDelta;
+            }
+
+            LayoutElement templateLayout = template.GetComponent<LayoutElement>();
+            LayoutElement rowLayout = generalOptionsRow.GetComponent<LayoutElement>();
+            rowLayout.preferredHeight = templateLayout != null &&
+                templateLayout.preferredHeight > 0f
+                ? templateLayout.preferredHeight
+                : Mathf.Max(40f, templateRect == null ? 0f : templateRect.rect.height);
+            rowLayout.flexibleWidth = 1f;
+
+            HorizontalLayoutGroup layout =
+                generalOptionsRow.GetComponent<HorizontalLayoutGroup>();
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.spacing = 24f;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+
+            MoveCheckboxIntoRow(fpsCheckbox);
+            MoveCheckboxIntoRow(dialogueCheckbox);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rowRect);
+        }
+
+        private static void MoveCheckboxIntoRow(GameObject checkbox)
+        {
+            checkbox.transform.SetParent(generalOptionsRow.transform, false);
+            LayoutElement layout = checkbox.GetComponent<LayoutElement>();
+            if (layout == null)
+            {
+                layout = checkbox.AddComponent<LayoutElement>();
+            }
+
+            layout.minWidth = 0f;
+            layout.preferredWidth = 0f;
+            layout.flexibleWidth = 1f;
+            AdjustFocusGraphic(
+                checkbox,
+                checkbox == fpsCheckbox ? -160f : 64f);
+        }
+
+        private static void AdjustFocusGraphic(
+            GameObject checkbox,
+            float widthAdjustment)
+        {
+            RectTransform[] rects =
+                checkbox.GetComponentsInChildren<RectTransform>(true);
+            for (int i = 0; i < rects.Length; i++)
+            {
+                if (rects[i].name == "WidgetBackground")
+                {
+                    rects[i].sizeDelta += new Vector2(widthAdjustment, 0f);
+                    return;
+                }
+            }
+        }
+
+        private static void CreateSubtitleScaleSlider(vgSettingsMenuController settingsMenu)
+        {
+            GameObject template = FindSliderTemplate(settingsMenu, 0);
+            if (template == null)
+            {
+                return;
+            }
+
+            subtitleScaleSlider = Object.Instantiate(template);
+            subtitleScaleSlider.SetActive(false);
+            subtitleScaleSlider.name = "Subtitle Size";
+            subtitleScaleSlider.transform.SetParent(template.transform.parent, false);
+            if (generalOptionsRow != null &&
+                generalOptionsRow.transform.parent == subtitleScaleSlider.transform.parent)
+            {
+                subtitleScaleSlider.transform.SetSiblingIndex(
+                    generalOptionsRow.transform.GetSiblingIndex() + 1);
+            }
+            else
+            {
+                subtitleScaleSlider.transform.SetAsLastSibling();
+            }
+
+            RemoveOriginalOptionLogic(subtitleScaleSlider);
+            ConfigureSliderLabels(
+                subtitleScaleSlider,
+                "Subtitle Size",
+                Mathf.RoundToInt(SubtitleScaleSetting.Value) + "%",
+                out subtitleScaleValueLabel);
+
+            Slider slider = subtitleScaleSlider.GetComponentInChildren<Slider>(true);
+            if (slider != null)
+            {
+                slider.onValueChanged.RemoveAllListeners();
+                slider.minValue = SubtitleScaleSetting.Minimum;
+                slider.maxValue = SubtitleScaleSetting.Maximum;
+                slider.wholeNumbers = true;
+                slider.value = SubtitleScaleSetting.Value;
+                slider.onValueChanged.AddListener(SetSubtitleScale);
+            }
+
+            subtitleScaleSlider.SetActive(true);
         }
 
         private static void CreateFovSlider(vgSettingsMenuController settingsMenu)
@@ -284,18 +428,41 @@ namespace FirewatchHighFpsFix
 
         private static void ConfigureFovLabels()
         {
-            TextMeshProUGUI[] labels = fovSlider.GetComponentsInChildren<TextMeshProUGUI>(true);
+            ConfigureSliderLabels(
+                fovSlider,
+                "Field of View",
+                Mathf.RoundToInt(FovSetting.Value).ToString(),
+                out fovValueLabel);
+        }
+
+        private static void ConfigureSliderLabels(
+            GameObject row,
+            string label,
+            string value,
+            out TextMeshProUGUI valueLabel)
+        {
+            valueLabel = null;
+            TextMeshProUGUI[] labels = row.GetComponentsInChildren<TextMeshProUGUI>(true);
             for (int i = 0; i < labels.Length; i++)
             {
                 if (labels[i].gameObject.name.ToLowerInvariant().Contains("value"))
                 {
-                    fovValueLabel = labels[i];
-                    fovValueLabel.text = Mathf.RoundToInt(FovSetting.Value).ToString();
+                    valueLabel = labels[i];
+                    valueLabel.text = value;
                 }
                 else
                 {
-                    labels[i].text = "Field of View";
+                    labels[i].text = label;
                 }
+            }
+        }
+
+        private static void SetSubtitleScale(float value)
+        {
+            SubtitleScaleSetting.SetValue(value);
+            if (subtitleScaleValueLabel != null)
+            {
+                subtitleScaleValueLabel.text = Mathf.RoundToInt(value) + "%";
             }
         }
 
