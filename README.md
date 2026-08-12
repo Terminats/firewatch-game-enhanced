@@ -54,6 +54,22 @@ src\FirewatchHighFpsFix\bin\Release\FirewatchHighFpsFix.dll
 
 Run `Package.ps1` after building to create the distributable archive.
 
+## Unused voice extractor
+
+The repository includes an optional script for extracting English voice
+recordings that have no dialogue definition or direct reference in the shipped
+game data.
+
+Install its Python dependency and run it from the repository directory:
+
+```powershell
+python -m pip install wem2ogg
+python scripts\extract_unused_voices.py
+```
+
+The resulting OGG files and `index.csv` are written to `unused-voice`. These
+files are probably unused recordings or dynamically constructed audio events. I did not verify that but if somebody has time they can dig through and see if there is anything interesting in there.
+
 ## License
 
 The patch source code is available under the MIT License. BepInEx is a separate
