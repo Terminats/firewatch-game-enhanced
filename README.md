@@ -1,6 +1,6 @@
 # Firewatch Enhanced
 
-A small collection of fixes for the Windows version of Firewatch.
+A small collection of fixes for Firewatch on Windows and Linux.
 
 
 ## Features
@@ -23,11 +23,34 @@ The new options are available in the existing General, Graphics, and Controls se
 
 ## Installation
 
-Download a release and extract it into the Firewatch folder, next to
+### Windows
+
+Download the Windows release and extract it into the Firewatch folder, next to
 `Firewatch.exe`. The release includes BepInEx 5, so no separate mod loader is
 needed.
 
 The current build targets the 64-bit GOG version of the game.
+
+### Native Linux and SteamOS
+
+Download the `linux-x64` release. Make sure Steam is using the native Linux
+build of Firewatch rather than a forced Proton version, then:
+
+1. Open **Installed Files > Browse** and extract the archive into the game
+   directory, next to `fw.x86_64`.
+2. Open a terminal in that directory and run:
+
+   ```sh
+   chmod +x run_bepinex.sh
+   ```
+
+3. In **Properties > General**, enter this in **Launch Options**:
+
+   ```text
+   ./run_bepinex.sh %command%
+   ```
+
+4. Start the game normally through Steam.
 
 ## Noclip
 

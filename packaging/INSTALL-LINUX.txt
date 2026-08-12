@@ -1,0 +1,61 @@
+Firewatch Enhanced 1.2.0 - Native Linux x64
+============================================
+
+Compatibility
+-------------
+This package targets the native 64-bit Linux version of Firewatch from Steam.
+It is not intended for the Windows version running through Proton.
+
+Installation
+------------
+1. Open the game directory containing fw.x86_64.
+2. Extract all files from this archive directly into that directory.
+3. Open a terminal in the game directory and run:
+
+       chmod +x run_bepinex.sh
+
+4. In Steam, open Firewatch > Properties > General and set Launch Options to:
+
+       ./run_bepinex.sh %command%
+
+5. Start the game normally through Steam.
+
+The package includes BepInEx 5.4.23.5 Linux x64. On the first launch, BepInEx
+creates its configuration and log directories automatically.
+
+Features
+--------
+- High frame rate movement fix
+- Optional FPS counter in General (off by default)
+- Optional unlimited dialogue time in General (off by default)
+- Subtitle Size slider in General (75%-200%, default 100%)
+- Field of View slider in Graphics (30-110, default 55)
+- Mouse Acceleration checkbox in Controls
+- Includes Ignore Pads option which is set by default, this fixes issue with controllers causing automatic rotation of character.
+- New Game (Skip Intro) button
+- Faster save loading and asset-streaming improvements
+- Reduced player interaction checks above 60 FPS
+
+Noclip for testing
+------------------
+Press F8 while playing to toggle noclip.
+
+    W/A/S/D       move horizontally
+    Space         move up
+    Left Ctrl     move down
+    Left Shift    move faster
+
+Uninstall only the patch
+------------------------
+Delete:
+
+    BepInEx/plugins/FirewatchHighFpsFix.dll
+
+Removing BepInEx completely
+---------------------------
+Only do this if no other installed mods use BepInEx. Remove:
+
+    BepInEx
+    libdoorstop.so
+    run_bepinex.sh
+    .doorstop_version

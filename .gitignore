@@ -8,6 +8,7 @@
 *.sln.docstates
 
 BepInEx.zip
+BepInEx-linux-x64.zip
 lib/
 
 *.log
