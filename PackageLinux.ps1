@@ -1,21 +1,20 @@
 [CmdletBinding()]
 param(
-    [string]$Version = "1.2.0"
+    [string]$Version = "1.2.1"
 )
 
 $ErrorActionPreference = "Stop"
 
 $root = $PSScriptRoot
 $bepInExZip = Join-Path $root "BepInEx-linux-x64.zip"
-$windowsRelease = Join-Path $root "dist\FirewatchEnhanced-$Version-GOG-win-x64.zip"
+$plugin = Join-Path $root "src\FirewatchHighFpsFix\bin\Release\FirewatchHighFpsFix.dll"
 $readme = Join-Path $root "packaging\INSTALL-LINUX.txt"
 $dist = Join-Path $root "dist"
 $outputZip = Join-Path $dist "FirewatchEnhanced-$Version-linux-x64.zip"
 $staging = Join-Path ([IO.Path]::GetTempPath()) ("FirewatchEnhanced-linux-" + [Guid]::NewGuid().ToString("N"))
-$releasedPlugin = Join-Path $staging "released-plugin"
 $packageRoot = Join-Path $staging "package"
 
-foreach ($file in @($bepInExZip, $windowsRelease, $readme)) {
+foreach ($file in @($bepInExZip, $plugin, $readme)) {
     if (-not (Test-Path -LiteralPath $file)) {
         throw "Required file was not found: $file"
     }
@@ -23,7 +22,6 @@ foreach ($file in @($bepInExZip, $windowsRelease, $readme)) {
 
 try {
     Expand-Archive -LiteralPath $bepInExZip -DestinationPath $packageRoot
-    Expand-Archive -LiteralPath $windowsRelease -DestinationPath $releasedPlugin
 
     $bepInExChangelog = Join-Path $packageRoot "changelog.txt"
     if (Test-Path -LiteralPath $bepInExChangelog) {
@@ -38,7 +36,7 @@ try {
 
     $pluginDirectory = Join-Path $packageRoot "BepInEx\plugins"
     New-Item -ItemType Directory -Path $pluginDirectory -Force | Out-Null
-    Copy-Item -LiteralPath (Join-Path $releasedPlugin "BepInEx\plugins\FirewatchHighFpsFix.dll") -Destination $pluginDirectory
+    Copy-Item -LiteralPath $plugin -Destination $pluginDirectory
     Copy-Item -LiteralPath $readme -Destination (Join-Path $packageRoot "FIREWATCH_ENHANCED_README.txt")
 
     New-Item -ItemType Directory -Path $dist -Force | Out-Null

@@ -18,8 +18,14 @@ A small collection of fixes for Firewatch on Windows and Linux.
 - Includes a simple noclip mode for unstucking your character.
 - Improves save loading and reduces some asset-streaming stalls.
 - Reduces unnecessary player interaction checks above 60 FPS.
+- Prevents the Free Roam day/night cycle from getting stuck after leaving the
+  cave.
 
 The new options are available in the existing General, Graphics, and Controls settings.
+
+If an existing Free Roam save already has broken cave lighting, install the
+patch, enter the cave again and move through gate until you drop on the first stone, after that go you can go back and the day/night cycle should be restored. The exit event
+will restore the day/night cycle and the next save should load correctly.
 
 ## Installation
 

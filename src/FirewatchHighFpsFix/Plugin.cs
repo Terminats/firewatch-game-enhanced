@@ -9,9 +9,10 @@ namespace FirewatchHighFpsFix
     {
         public const string PluginGuid = "pl.firewatch.highfpsfix";
         public const string PluginName = "Firewatch Enhanced";
-        public const string PluginVersion = "1.2.0";
+        public const string PluginVersion = "1.2.1";
 
         internal static ConfigEntry<bool> IgnoreGamepads { get; private set; }
+        internal static ConfigEntry<bool> ShowForrest64Prototype { get; private set; }
         internal static NoclipController Noclip { get; private set; }
         internal static FpsCounter FpsCounter { get; private set; }
 
@@ -22,9 +23,18 @@ namespace FirewatchHighFpsFix
                 "IgnoreGamepads",
                 true,
                 "Ignore input from connected controllers and virtual gamepads.");
+            ShowForrest64Prototype = Config.Bind(
+                "Experimental",
+                "ShowForrest64Prototype",
+                false,
+                "Show the unfinished Forrest 64 prototype in Special Features.");
             TextureStreamingPatch.Apply();
             new Harmony(PluginGuid).PatchAll();
-            Forrest64Controller.Initialize();
+            FreeRoamPatch.Initialize();
+            if (ShowForrest64Prototype.Value)
+            {
+                Forrest64Controller.Initialize();
+            }
             Noclip = new NoclipController();
             FpsCounter = new FpsCounter();
         }
@@ -47,12 +57,18 @@ namespace FirewatchHighFpsFix
 
         private void Update()
         {
-            Forrest64Controller.Update();
+            if (ShowForrest64Prototype.Value)
+            {
+                Forrest64Controller.Update();
+            }
         }
 
         private void OnGUI()
         {
-            Forrest64Controller.OnGUI();
+            if (ShowForrest64Prototype.Value)
+            {
+                Forrest64Controller.OnGUI();
+            }
         }
 
     }

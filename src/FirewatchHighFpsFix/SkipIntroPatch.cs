@@ -137,6 +137,12 @@ namespace FirewatchHighFpsFix
         [HarmonyPostfix]
         private static void Postfix(vgSpecialFeaturesMenuController __instance)
         {
+            if (Plugin.ShowForrest64Prototype == null ||
+                !Plugin.ShowForrest64Prototype.Value)
+            {
+                return;
+            }
+
             Button template = FindFreeRoamButton(__instance);
             if (template == null)
             {
