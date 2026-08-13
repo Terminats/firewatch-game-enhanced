@@ -1,4 +1,5 @@
 using System;
+using HarmonyLib;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using UnityEngine;
@@ -21,7 +22,6 @@ namespace FirewatchHighFpsFix
 
         internal static void Apply()
         {
-            UnlockNativeFreeRoamButton();
             PreserveCaveExitEvents();
         }
 
@@ -71,45 +71,6 @@ namespace FirewatchHighFpsFix
             return false;
         }
 
-        private static void UnlockNativeFreeRoamButton()
-        {
-            vgSpecialFeaturesMenuController menu =
-                UnityEngine.Object.FindObjectOfType<
-                    vgSpecialFeaturesMenuController>();
-            if (menu == null)
-            {
-                return;
-            }
-
-            GameObject enabledRoot = null;
-            GameObject disabledRoot = null;
-            Transform[] children = menu.GetComponentsInChildren<Transform>(true);
-            for (int i = 0; i < children.Length; i++)
-            {
-                if (children[i].name == "SpecialFeaturesFreeRoam")
-                {
-                    enabledRoot = children[i].gameObject;
-                }
-                else if (children[i].name ==
-                    "SpecialFeaturesFreeRoam_disabled")
-                {
-                    disabledRoot = children[i].gameObject;
-                }
-            }
-
-            if (enabledRoot == null || enabledRoot.activeSelf)
-            {
-                return;
-            }
-
-            if (disabledRoot != null)
-            {
-                disabledRoot.SetActive(false);
-            }
-
-            enabledRoot.SetActive(true);
-            SkipIntroButtonPatch.RebuildSelection(enabledRoot);
-        }
     }
 
     internal sealed class FreeRoamPatchRunner : MonoBehaviour
@@ -125,6 +86,32 @@ namespace FirewatchHighFpsFix
 
             nextUpdate = Time.realtimeSinceStartup + 1f;
             FreeRoamPatch.Apply();
+        }
+    }
+
+    [HarmonyPatch(typeof(Fsm), "ProcessEvent")]
+    internal static class FreeRoamCaveExitFactPatch
+    {
+        private const string TimeOfDayFsmName = "Amazing Time Of Day Robot";
+        private const string CaveExitEvent = "FreeRoamExitedCave";
+
+        private static void Prefix(Fsm __instance, FsmEvent fsmEvent)
+        {
+            if (__instance == null || fsmEvent == null ||
+                __instance.Name != TimeOfDayFsmName ||
+                fsmEvent.Name != CaveExitEvent)
+            {
+                return;
+            }
+
+            vgEventManager eventManager = vgEventManager.Instance;
+            if (eventManager != null)
+            {
+                eventManager.SetFact(
+                    "FreeRoamInCave",
+                    false,
+                    vgBlackboardLocationHint.Global);
+            }
         }
     }
 }
