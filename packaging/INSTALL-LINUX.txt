@@ -1,4 +1,4 @@
-Firewatch Enhanced 1.2.1 - Native Linux x64
+Firewatch Enhanced 1.2.2 - Native Linux x64
 ============================================
 
 Compatibility
@@ -37,6 +37,8 @@ Features
 - Reduced player interaction checks above 60 FPS
 - Prevents the Free Roam day/night cycle from getting stuck after leaving the
   cave.
+- Prevents long-running Free Roam saves from loading an invalid day/night
+  cycle step after the cycle wraps around.
 
 If an existing Free Roam save already has broken cave lighting, install the
 patch, enter the cave again and move through gate until you drop on the first stone, after that go you can go back and the day/night cycle should be restored. The exit event

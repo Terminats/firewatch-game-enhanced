@@ -20,6 +20,8 @@ A small collection of fixes for Firewatch on Windows and Linux.
 - Reduces unnecessary player interaction checks above 60 FPS.
 - Prevents the Free Roam day/night cycle from getting stuck after leaving the
   cave.
+- Prevents long-running Free Roam saves from loading an invalid day/night
+  cycle step after the cycle wraps around.
 
 The new options are available in the existing General, Graphics, and Controls settings.
 

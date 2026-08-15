@@ -9,7 +9,7 @@ namespace FirewatchHighFpsFix
     {
         public const string PluginGuid = "pl.firewatch.highfpsfix";
         public const string PluginName = "Firewatch Enhanced";
-        public const string PluginVersion = "1.2.1";
+        public const string PluginVersion = "1.2.2";
 
         internal static ConfigEntry<bool> IgnoreGamepads { get; private set; }
         internal static ConfigEntry<bool> ShowForrest64Prototype { get; private set; }
