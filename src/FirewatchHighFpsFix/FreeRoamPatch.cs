@@ -95,17 +95,52 @@ namespace FirewatchHighFpsFix
         private const string TimeOfDayFsmName = "Amazing Time Of Day Robot";
         private const string CaveExitEvent = "FreeRoamExitedCave";
 
-        private static void Prefix(Fsm __instance, FsmEvent fsmEvent)
+        private static void Prefix(Fsm __instance, ref FsmEvent fsmEvent)
         {
             if (__instance == null || fsmEvent == null ||
-                __instance.Name != TimeOfDayFsmName ||
-                fsmEvent.Name != CaveExitEvent)
+                __instance.Name != TimeOfDayFsmName)
             {
                 return;
             }
 
             vgEventManager eventManager = vgEventManager.Instance;
-            if (eventManager != null)
+            if (__instance.ActiveStateName == "State 2")
+            {
+                int triggerNumber;
+                if (int.TryParse(fsmEvent.Name, out triggerNumber) &&
+                    (triggerNumber < 1 || triggerNumber > 38))
+                {
+                    FsmInt currentTrigger =
+                        __instance.Variables.GetFsmInt("CurrentTriggerNumber");
+                    FsmInt upcomingTrigger =
+                        __instance.Variables.GetFsmInt("UpcomingTriggerNumber");
+                    if (currentTrigger != null)
+                    {
+                        currentTrigger.Value = 1;
+                    }
+                    if (upcomingTrigger != null)
+                    {
+                        upcomingTrigger.Value = 2;
+                    }
+
+                    if (eventManager != null)
+                    {
+                        eventManager.SetFact(
+                            "TODCurrentTrigger",
+                            vgFactOperation.Set,
+                            1f,
+                            vgBlackboardLocationHint.Global);
+                    }
+
+                    FsmEvent firstTrigger = __instance.GetEvent("1");
+                    if (firstTrigger != null)
+                    {
+                        fsmEvent = firstTrigger;
+                    }
+                }
+            }
+
+            if (fsmEvent.Name == CaveExitEvent && eventManager != null)
             {
                 eventManager.SetFact(
                     "FreeRoamInCave",
